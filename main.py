@@ -5,10 +5,6 @@ from dotenv import load_dotenv
 from fastapi.middleware.cors import CORSMiddleware
 import os
 import uuid
-# from langdetect import detect  # optional, can remove if langdetect not installed
-
-# Load environment variables
-load_dotenv()
 
 # Initialize FastAPI and Groq client
 app = FastAPI()
