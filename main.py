@@ -15,7 +15,17 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-client = Groq(api_key=os.getenv("GROQ_API_KEY"))
+# Load environment variables from .env (must happen before creating clients that rely on them)
+load_dotenv()
+
+# Read GROQ API key and fail fast with a clear message if it's missing
+_groq_api_key = os.getenv("GROQ_API_KEY")
+if not _groq_api_key:
+    raise RuntimeError(
+        "GROQ_API_KEY is not set. Please set it in your environment or in a .env file in the project root."
+    )
+
+client = Groq(api_key=_groq_api_key)
 
 # Models to rotate between
 MODELS = [
