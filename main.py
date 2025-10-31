@@ -76,9 +76,9 @@ async def chat_with_shokti(user_message: UserMessage):
     user_text = user_message.message
     session_id = user_message.session_id or str(uuid.uuid4())
 
-    retrieved_docs = rag_pipeline().similarity_search(user_text, k=4)
+    retrieved_docs = rag_pipeline().similarity_search(user_text, k=10)
     context = "\n\n".join([
-        f"Record at {doc.metadata['datetime']}:"
+        f"Record at {doc.metadata['datetime']}: {doc.page_content}"
         for doc in retrieved_docs
     ])
 
@@ -87,7 +87,7 @@ async def chat_with_shokti(user_message: UserMessage):
 Context of Power Consumption Records:
 {context}
 """
-
+    print(context)
     # Initialize session if new
     if session_id not in sessions:
         sessions[session_id] = []

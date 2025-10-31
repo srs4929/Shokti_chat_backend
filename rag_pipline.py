@@ -2,7 +2,7 @@ import os
 import json
 from dotenv import load_dotenv
 from langchain_community.document_loaders import JSONLoader
-from langchain_ollama import OllamaEmbeddings
+from langchain_huggingface.embeddings import HuggingFaceEmbeddings
 from langchain_community.vectorstores import FAISS
 from langchain_core.documents import Document
 from numpy import record
@@ -30,9 +30,9 @@ def transform_record_to_document(record):
     - Global Reactive Power: {record['Global_reactive_power']:.2f} kVAR
     - Voltage: {record['Voltage']:.1f} V
     - Global Intensity: {record['Global_intensity']:.1f} A
-    - Sub-metering 1 (kitchen): {record['Sub_metering_1']:.1f} Wh
-    - Sub-metering 2 (laundry): {record['Sub_metering_2']:.1f} Wh
-    - Sub-metering 3 (HVAC): {record['Sub_metering_3']:.1f} Wh
+    - Sub-metering 1 (kitchen): {record['Sub_metering_1']:.1f} kWh
+    - Sub-metering 2 (laundry): {record['Sub_metering_2']:.1f} kWh
+    - Sub-metering 3 (HVAC): {record['Sub_metering_3']:.1f} kWh
     - Time: {record['Hour']}:00 hours
     - Day of week: {record['Day_of_week']} ({'Weekend' if record['Day_of_week'] in [5, 6] else 'Weekday'})
     - Holiday: {'Yes' if record['Holiday'] else 'No'}
@@ -77,10 +77,7 @@ def rag_pipeline():
         transformed_doc = transform_record_to_document(record)
         documents.append(transformed_doc)
 
-    print(f"Created {len(documents)} documents with text descriptions and metadata")
-
-
-    embeddings = OllamaEmbeddings(model="nomic-embed-text:v1.5")
+    embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
 
 
     vector_db = FAISS.from_documents(documents, embeddings)
@@ -88,3 +85,6 @@ def rag_pipeline():
 
     print("Vector database created and saved successfully!")
     return vector_db
+
+if __name__ == "__main__":
+    rag_pipeline()
