@@ -1,0 +1,19 @@
+[project]
+name = "shokti-chat-backend"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "dotenv>=0.9.9",
+    "faiss-cpu>=1.12.0",
+    "fastapi>=0.120.3",
+    "groq>=0.33.0",
+    "jq>=1.10.0",
+    "langchain>=1.0.3",
+    "langchain-community>=0.4.1",
+    "langchain-ollama>=1.0.0",
+    "pydantic>=2.12.3",
+    "supabase>=2.22.4",
+    "uvicorn>=0.38.0",
+]

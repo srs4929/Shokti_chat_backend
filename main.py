@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 from fastapi.middleware.cors import CORSMiddleware
 import os
 import uuid
+from rag_pipline import rag_pipeline
 
 # Initialize FastAPI and Groq client
 app = FastAPI()
@@ -33,6 +34,7 @@ MODELS = [
    "meta-llama/llama-4-maverick-17b-128e-instruct",
    "llama-3.1-8b-instant",
 ]
+
 
 # System prompt with full Shokti app context
 SYSTEM_PROMPT = """
@@ -67,12 +69,24 @@ sessions = {}  # session_id -> list of messages
 # Pydantic model
 class UserMessage(BaseModel):
     message: str
-    session_id: str = None  # optional
+    session_id: str|None = None  # optional
 
 @app.post("/chat")
 async def chat_with_shokti(user_message: UserMessage):
     user_text = user_message.message
     session_id = user_message.session_id or str(uuid.uuid4())
+
+    retrieved_docs = rag_pipeline().similarity_search(user_text, k=4)
+    context = "\n\n".join([
+        f"Record at {doc.metadata['datetime']}:"
+        for doc in retrieved_docs
+    ])
+
+    rag_prompt = f"""{SYSTEM_PROMPT}
+
+Context of Power Consumption Records:
+{context}
+"""
 
     # Initialize session if new
     if session_id not in sessions:
@@ -81,8 +95,8 @@ async def chat_with_shokti(user_message: UserMessage):
     # Append user message to session history
     sessions[session_id].append({"role": "user", "content": user_text})
 
-    
-    prompt = SYSTEM_PROMPT
+
+    prompt = rag_prompt
 
     reply_text = "Sorry, I couldn't process your message. Please try again."
 
